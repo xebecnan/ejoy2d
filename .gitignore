@@ -5,5 +5,7 @@ ej2d.dSYM/*
 *.exe
 *.dll
 *.ilk
+*.o
+*.swp
 mac/example/example.xcodeproj/xcuserdata
 mac/example/example.xcodeproj/project.xcworkspace/xcuserdata
