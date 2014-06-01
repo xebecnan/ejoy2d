@@ -247,9 +247,10 @@ ejoy2d_game_update(struct game *G, float time) {
 }
 
 void
-ejoy2d_game_drawframe(struct game *G) {
+ejoy2d_game_drawframe(struct game *G, float delta_time) {
 	lua_pushvalue(G->L, DRAWFRAME_FUNCTION);
-	call(G->L, 0, 0);
+	lua_pushnumber(G->L, delta_time);
+	call(G->L, 1, 0);
 	lua_settop(G->L, TOP_FUNCTION);
 	shader_flush();
 	label_flush();
