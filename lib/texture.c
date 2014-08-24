@@ -1,5 +1,6 @@
 #include "texture.h"
 #include "shader.h"
+#include "fault.h"
 
 #define MAX_TEXTURE 128
 #define IS_POT(x) (((x) & ((x) -1)) == 0)
@@ -19,8 +20,13 @@ struct texture_pool {
 
 static struct texture_pool POOL;
 
+int
+texture_count() {
+	return POOL.count;
+}
+
 const char * 
-texture_load(int id, int pixel_format, int pixel_width, int pixel_height, void *data) {
+texture_load(int id, int pixel_format, int pixel_width, int pixel_height, int size, void *data) {
 	if (id >= MAX_TEXTURE) {
 		return "Too many texture";
 	}
@@ -69,10 +75,21 @@ texture_load(int id, int pixel_format, int pixel_width, int pixel_height, void *
 		case Texture2DPixelFormat_A8:
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, (GLsizei)pixel_width, (GLsizei)pixel_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, data);
 			break;
+		case Texture2DPixelFormat_PVRTC4:
+			glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG, (GLsizei)pixel_width, (GLsizei)pixel_height, 0, (GLsizei)size, data);
+			break;
+		case Texture2DPixelFormat_PVRTC2:
+			glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG, (GLsizei)pixel_width, (GLsizei)pixel_height, 0, (GLsizei)size, data);
+			break;
 		default:
 			glDeleteTextures(1,&tex->id);
 			tex->id = 0;
 			return "Invalid pixel format";
+	}
+
+	GLenum error = glGetError();
+	if(error != GL_NO_ERROR) {
+		fault("texture_load error: 0x%04X", (int)error);
 	}
 
 	return NULL;

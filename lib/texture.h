@@ -11,7 +11,8 @@
 #define Texture2DPixelFormat_RGB565 6
 #define Texture2DPixelFormat_A8 7
 
-const char * texture_load(int id, int type, int width, int height, void *buffer);
+int texture_count();
+const char * texture_load(int id, int type, int width, int height, int size, void *buffer);
 void texture_unload(int id);
 GLuint texture_glid(int id);
 void texture_coord(int id, float *x, float *y);
